@@ -113,3 +113,30 @@ export default function trydo<E, R, A extends any[]>(
         return [err, undefined];
     }
 }
+
+/**
+ * Calls a traditional Node.js error-first callback style function and returns
+ * a promise wrapped on the result.
+ */
+trydo.promisify = function promisify<E = any, R = any, A extends any[]= any[]>(
+    fn: (...args: any[]) => any,
+    ...args: A
+): Promise<[E, R]> {
+    return new Promise((resolve: ([E, R]) => void) => {
+        fn.call(void 0, ...args, function (err: Error, ...values: any[]) {
+            if (arguments.length === 1 &&
+                err !== null && err !== undefined && !(err instanceof Error)) {
+                // In this case, err is not an error. e.g. fs.exists.
+                resolve([null, err] as [E, R]);
+            } else if (err) {
+                resolve([err, undefined]);
+            } else {
+                if (values.length > 1) {
+                    resolve([null, values] as [E, any]);
+                } else {
+                    resolve([null, values[0]]);
+                }
+            }
+        });
+    });
+};

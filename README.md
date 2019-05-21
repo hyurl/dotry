@@ -159,3 +159,30 @@ function trydo<E = any, R = any, A extends any[]= any[]>(
 All these signatures will pack the result of the input function (`fn`) to an
 two-element array which the first element is the potential error and the second
 element is the return value (or yield value).
+
+## Dealing With Traditional Callback Style Functions
+
+There are two ways to deal with traditional callback style functions, use
+`util.promisify` to wrap the function, or use `trydo.promisify` to call the
+function and pack the results.
+
+```typescript
+import * as fs from "fs";
+import * as util from "util";
+import trydo from "trydo";
+
+// These two examples are equivalent 
+(async () => {
+    const getStat = util.promisify(fs.stat);
+    let [err, stat] = await trydo<Error, fs.Stats, [string]>(getStat, __filename);
+    // ...
+})();
+
+(async () => {
+    let [
+        err,
+        stat
+    ] = await trydo.promisify<Error, fs.Stats, [string]>(fs.stat, __filename);
+    // ...
+})();
+```

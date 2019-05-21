@@ -1,5 +1,6 @@
-import * as assert from "assert";
 import trydo from "../src";
+import * as assert from "assert";
+import * as fs from "fs";
 
 const EmptyStringError = new Error("the string must not be empty");
 
@@ -346,5 +347,110 @@ describe("trydo", () => {
 
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!13");
+    });
+});
+
+describe("trydo.promosify", () => {
+    it("should return a promise of result as expected", async () => {
+        let [
+            err,
+            stat
+        ] = await trydo.promisify<NodeJS.ErrnoException, fs.Stats, [string]>(
+            fs.stat,
+            __filename
+        );
+
+        assert.strictEqual(err, null);
+        assert.strictEqual(stat.isFile(), true);
+
+        let [
+            _err,
+            _stat
+        ] = await trydo.promisify<NodeJS.ErrnoException, fs.Stats, [string]>(
+            fs.stat,
+            __filename + ".map"
+        );
+
+        assert.strictEqual(_err.name, "Error");
+        assert.strictEqual(_err.code, "ENOENT");
+        assert.strictEqual(_stat, undefined);
+    });
+
+    it("should promisify a function without error argument as expected", async () => {
+        let [err, exists] = await trydo.promisify<null, boolean, [string]>(
+            fs.exists,
+            __filename
+        );
+
+        assert.strictEqual(err, null);
+        assert.strictEqual(exists, true);
+
+        let [_err, _exists] = await trydo.promisify<null, boolean, [string]>(
+            fs.exists,
+            __filename + ".map"
+        );
+
+        assert.strictEqual(_err, null);
+        assert.strictEqual(_exists, false);
+    });
+
+    it("should promisify a function with only error argument as expected", async () => {
+        let [
+            err,
+            res
+        ] = await trydo.promisify<NodeJS.ErrnoException, void, [string, number]>(
+            fs.access,
+            __filename,
+            fs.constants.F_OK
+        );
+
+        assert.strictEqual(err, null);
+        assert.strictEqual(res, undefined);
+
+        let [
+            _err,
+            _res
+        ] = await trydo.promisify<NodeJS.ErrnoException, void, [string, number]>(
+            fs.access,
+            __filename + ".map",
+            fs.constants.F_OK
+        );
+
+        assert.strictEqual(_err.name, "Error");
+        assert.strictEqual(_err.code, "ENOENT");
+        assert.strictEqual(_res, undefined);
+    });
+
+    it("should promisify a function with array result as expected", async () => {
+        function test(
+            data: string[],
+            callback: (err: Error, ...data: string[]) => void
+        ) {
+            if (!data || data.length === 0) {
+                callback(new Error("data can not be empty"));
+            } else {
+                callback(null, ...data);
+            }
+        }
+
+        let [
+            err,
+            data
+        ] = await trydo.promisify<Error, string[], [string[]]>(test, [
+            "Hello",
+            "World"
+        ]);
+
+        assert.strictEqual(err, null);
+        assert.deepStrictEqual(data, ["Hello", "World"]);
+
+        let [
+            _err,
+            _data
+        ] = await trydo.promisify<Error, string[], [string[]]>(test, []);
+
+        assert.strictEqual(_err.name, "Error");
+        assert.strictEqual(_err.message, "data can not be empty");
+        assert.strictEqual(_data, undefined);
     });
 });
