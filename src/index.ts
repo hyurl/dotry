@@ -41,7 +41,7 @@ export default function trydo<E, R, A extends any[]>(
                 let result: any;
 
                 // Use `while` loop instead of `for...of...` in order to
-                // retrieve the returning value of a generator function.
+                // retrieve the return value of a generator function.
                 while (true) {
                     try {
                         let {

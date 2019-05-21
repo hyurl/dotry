@@ -7,10 +7,9 @@ Unlike other packages, **trydo** support all JavaScript functions, which are
 regardless of transpiling to `es5`, `es2015`, `es2016` or even higher versions.
 
 And since it's well typed in TypeScript, it is easy to just pass any function
-to **trydo**, and TypeScript will automatically infer returning types of the
-result.
+to **trydo**, and TypeScript will automatically infer return types of the result.
 
-Also, **trydo** only packs the potential error and the returning value into the
+Also, **trydo** only packs the potential error and the return value into the
 form of `[err, res]`, it **DOES NOT** change the outlook of the original
 function.
 
@@ -27,7 +26,7 @@ import trydo from "trydo";
 
 // A regular function
 // TypeScript cannot auto infer error types, we must provided them as the first
-// type argument of `trydo`, and the second argument as the returning type.
+// type argument of `trydo`, and the second argument as the return type.
 // `err` will be of type `Error` and `res` will be of type `string`
 let [err, res] = trydo<Error, string>(check, "Hello, World!");
 function check(str: string) {
@@ -159,4 +158,4 @@ function trydo<E = any, R = any, A extends any[]= any[]>(
 
 All these signatures will pack the result of the input function (`fn`) to an 
 two-element array which the first element is the potential error and the second
-element is the returning value (or iterating value).
+element is the return value (or yielded value).
