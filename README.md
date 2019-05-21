@@ -2,9 +2,9 @@
 
 **Typed error-first try-catch convention of functions.**
 
-Unlike other packages, **trydo** support all JavaScript functions, which are
+Unlike other packages, **trydo** supports all JavaScript functions, which are
 `Function`, `AsyncFunction`, `GeneratorFunction` and `AsyncGeneratorFunction`,
-regardless of transpiling to `es5`, `es2015`, `es2016` or even higher versions.
+regardless of transpiling to `es5`, `es2015`, `es2016` or other versions.
 
 And since it's well typed in TypeScript, it is easy to just pass any function
 to **trydo**, and TypeScript will automatically infer return types of the result.
@@ -156,6 +156,6 @@ function trydo<E = any, R = any, A extends any[]= any[]>(
 ): [E, R];
 ```
 
-All these signatures will pack the result of the input function (`fn`) to an 
+All these signatures will pack the result of the input function (`fn`) to an
 two-element array which the first element is the potential error and the second
-element is the return value (or yielded value).
+element is the return value (or yield value).
