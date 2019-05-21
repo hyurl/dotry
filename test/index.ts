@@ -13,7 +13,7 @@ describe("dotry", () => {
             return str;
         }
 
-        let res = dotry(check, "Hello, World!");
+        let res = dotry<Error, string, [string]>(check, "Hello, World!");
         let _res = dotry<Error, string, [string]>(check, "");
         let [err, str] = res;
         let [_err, _str] = _res;
@@ -254,7 +254,7 @@ describe("dotry", () => {
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = dotry(check, "");
+        let _res = dotry<Error, string, [string]>(check, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -350,7 +350,7 @@ describe("dotry", () => {
     });
 });
 
-describe("dotry.promosify", () => {
+describe("dotry.promisify", () => {
     it("should return a promise of result as expected", async () => {
         let [
             err,
@@ -401,7 +401,7 @@ describe("dotry.promosify", () => {
         ] = await dotry.promisify<NodeJS.ErrnoException, void, [string, number]>(
             fs.access,
             __filename,
-            fs.constants.F_OK
+            0
         );
 
         assert.strictEqual(err, null);
@@ -413,7 +413,7 @@ describe("dotry.promosify", () => {
         ] = await dotry.promisify<NodeJS.ErrnoException, void, [string, number]>(
             fs.access,
             __filename + ".map",
-            fs.constants.F_OK
+            0
         );
 
         assert.strictEqual(_err.name, "Error");
