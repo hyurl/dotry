@@ -129,25 +129,25 @@ function iterateAsync(data: number[]) {
 ## API
 
 ```typescript
-function trydo<E extends Error, R, A extends any[]= any[]>(
+function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
     thisArg?: any,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
-function trydo<E extends Error, R, A extends any[]= any[]>(
+function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
     thisArg?: any,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
-function trydo<E extends Error, R, A extends any[]= any[]>(
+function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
     thisArg?: any,
     ...args: A
 ): Promise<[E, R]>;
 
-function trydo<E extends Error, R, A extends any[]= any[]>(
+function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
     thisArg?: any,
     ...args: A
