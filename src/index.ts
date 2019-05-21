@@ -37,7 +37,7 @@ export default function trydo<E, R, A extends any[]>(
 
         if (isAsyncGenerator(res)) {
             return (async function* () {
-                let input = undefined;
+                let input: any;
                 let result: any;
 
                 // Use `while` loop instead of `for...of...` in order to
@@ -71,7 +71,7 @@ export default function trydo<E, R, A extends any[]>(
             })() as AsyncIterableIterator<[E, R]>;
         } else if (isGenerator(res)) {
             return (function* () {
-                let input = undefined;
+                let input: any;
                 let result: any;
 
                 while (true) {
