@@ -39,6 +39,7 @@ function check(str: string) {
 
 
 // An async function
+// Just for simplicity, don't forget to code in an async function on your own.
 // `err` will be of type `Error` and `res` will be of type `string`
 let [err, res] = await trydo<Error, string>(checkAsync, "Hello, World!");
 async function checkAsync(str: string) {
@@ -75,6 +76,8 @@ async function* iterateAsync(data: number[]) {
     }
 }
 
+// Just for simplicity, don't forget to code in an async function on your own.
+// `err` will be of type `RangeError`, and `value` will be of type `number`.
 let iterator = trydo<RangeError, number>(iterate, 1, 2, 3, 4);
 for await (let [err, value] of iterator) {
     // ...
