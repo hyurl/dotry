@@ -22,8 +22,10 @@ npm i trydo
 import trydo from "trydo";
 
 // A regular function
+// TypeScript cannot auto infer error types, we must provided them as the first
+// type argument of `trydo`, and the second argument as the returning type.
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = trydo(check, void 0, "Hello, World!");
+let [err, res] = trydo<Error, string>(check, void 0, "Hello, World!");
 function check(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -34,7 +36,7 @@ function check(str: string) {
 
 // An async function
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = await trydo(checkAsync, void 0, "Hello, World!");
+let [err, res] = await trydo<Error, string>(checkAsync, void 0, "Hello, World!");
 async function checkAsync(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -53,10 +55,7 @@ function* iterate(data: number[]) {
     }
 }
 
-// TypeScript cannot auto infer error types, we must provided them as the first
-// type argument of `trydo`, and the second argument as the returning type.
-// In this case, `err` will be of type `RangeError`, and `value` will be of type
-// `number`.
+// `err` will be of type `RangeError`, and `value` will be of type `number`.
 for (let [err, value] of trydo<RangeError, number>(iterate, void 0, 1, 2, 3, 4)) {
     // ...
 }
@@ -80,12 +79,12 @@ for await (let [err, value] of iterator) {
 
 ## More Well-formed
 
-Instead of every time invoking the function by calling `trydo()` explicitly, it
+Instead of every time invoking the function by calling `trydo<Error, string>()` explicitly, it
 is recommended to wrap the function body instead.
 
 ```typescript
 function check(str: string) {
-    return trydo(() => {
+    return trydo<Error, string>(() => {
         if (str.length === 0) {
             throw new Error("the string must not be empty");
         }
@@ -94,7 +93,7 @@ function check(str: string) {
 }
 
 function checkAsync(str: string) {
-    return trydo(async () => {
+    return trydo<Error, string>(async () => {
         if (str.length === 0) {
             throw new Error("the string must not be empty");
         }
@@ -166,14 +165,14 @@ class method.
 ```typescript
 class Test {
     doSomething(action: string, data: string[]) {
-        return trydo(function (this: Test) {
+        return trydo<Error, string>(function (this: Test) {
             // ...
         }, this);
     }
 
     // is equalvelent to
     doSomething2(action: string, data: string[]) {
-        return trydo(() => {
+        return trydo<Error, string>(() => {
             // ...
         });
     }
@@ -181,13 +180,13 @@ class Test {
     // However, when it comes to generators, you have to use keyword `function`
     // and pass the `thisArg`.
     doSomething3(action: string, data: string[]) {
-        return trydo(function* (this: Test) {
+        return trydo<Error, string>(function* (this: Test) {
             // ...
         }, this);
     }
 
     doSomething4(action: string, data: string[]) {
-        return trydo(async function* (this: Test) {
+        return trydo<Error, string>(async function* (this: Test) {
             // ...
         }, this);
     }
