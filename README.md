@@ -1,34 +1,34 @@
-# TryDo
+# dotry
 
 **Typed error-first try-catch convention of functions.**
 
-Unlike other packages, **trydo** supports all JavaScript functions, which are
+Unlike other packages, **dotry** supports all JavaScript functions, which are
 `Function`, `AsyncFunction`, `GeneratorFunction` and `AsyncGeneratorFunction`,
 regardless of transpiling to `es5`, `es2015`, `es2016` or other versions.
 
 And since it's well typed in TypeScript, it is easy to just pass any function
-to **trydo**, and TypeScript will automatically infer return types of the result.
+to **dotry**, and TypeScript will automatically infer return types of the result.
 
-Also, **trydo** only packs the potential error and the return value into the
+Also, **dotry** only packs the potential error and the return value into the
 form of `[err, res]`, it **DOES NOT** change the outlook of the original
 function.
 
 ## Install
 
 ```sh
-npm i trydo
+npm i dotry
 ```
 
 ## Example
 
 ```typescript
-import trydo from "trydo";
+import dotry from "dotry";
 
 // A regular function
 // TypeScript cannot auto infer error types, we must provided them as the first
-// type argument of `trydo`, and the second argument as the return type.
+// type argument of `dotry`, and the second argument as the return type.
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = trydo<Error, string>(check, "Hello, World!");
+let [err, res] = dotry<Error, string>(check, "Hello, World!");
 function check(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -40,7 +40,7 @@ function check(str: string) {
 // An async function
 // Just for simplicity, don't forget to code in an async function on your own.
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = await trydo<Error, string>(checkAsync, "Hello, World!");
+let [err, res] = await dotry<Error, string>(checkAsync, "Hello, World!");
 async function checkAsync(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -60,7 +60,7 @@ function* iterate(data: number[]) {
 }
 
 // `err` will be of type `RangeError`, and `value` will be of type `number`.
-for (let [err, value] of trydo<RangeError, number>(iterate, 1, 2, 3, 4)) {
+for (let [err, value] of dotry<RangeError, number>(iterate, 1, 2, 3, 4)) {
     // ...
 }
 
@@ -77,7 +77,7 @@ async function* iterateAsync(data: number[]) {
 
 // Just for simplicity, don't forget to code in an async function on your own.
 // `err` will be of type `RangeError`, and `value` will be of type `number`.
-let iterator = trydo<RangeError, number>(iterate, 1, 2, 3, 4);
+let iterator = dotry<RangeError, number>(iterate, 1, 2, 3, 4);
 for await (let [err, value] of iterator) {
     // ...
 }
@@ -85,12 +85,12 @@ for await (let [err, value] of iterator) {
 
 ## More Well-formed
 
-Instead of every time invoking the function by calling `trydo<Error, string>()`
+Instead of every time invoking the function by calling `dotry<Error, string>()`
 explicitly, it is recommended to wrap the function body instead.
 
 ```typescript
 function check(str: string) {
-    return trydo<Error, string>(() => {
+    return dotry<Error, string>(() => {
         if (str.length === 0) {
             throw new Error("the string must not be empty");
         }
@@ -99,7 +99,7 @@ function check(str: string) {
 }
 
 function checkAsync(str: string) {
-    return trydo<Error, string>(async () => {
+    return dotry<Error, string>(async () => {
         if (str.length === 0) {
             throw new Error("the string must not be empty");
         }
@@ -108,7 +108,7 @@ function checkAsync(str: string) {
 }
 
 function iterate(data: number[]) {
-    return trydo<RangeError, number>(function* () {
+    return dotry<RangeError, number>(function* () {
         for (let num of data) {
             if (num > 9) {
                 throw new RangeError(`number ${num} is out of range`);
@@ -120,7 +120,7 @@ function iterate(data: number[]) {
 }
 
 function iterateAsync(data: number[]) {
-    return trydo<RangeError, number>(async function* () {
+    return dotry<RangeError, number>(async function* () {
         for (let num of data) {
             if (num > 9) {
                 throw new RangeError(`number ${num} is out of range`);
@@ -135,22 +135,22 @@ function iterateAsync(data: number[]) {
 ## API
 
 ```typescript
-function trydo<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
-function trydo<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
-function trydo<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
     ...args: A
 ): Promise<[E, R]>;
 
-function trydo<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
     ...args: A
 ): [E, R];
@@ -163,18 +163,18 @@ element is the return value (or yield value).
 ## Dealing With Traditional Callback Style Functions
 
 There are two ways to deal with traditional callback style functions, use
-`util.promisify` to wrap the function, or use `trydo.promisify` to call the
+`util.promisify` to wrap the function, or use `dotry.promisify` to call the
 function and pack the results.
 
 ```typescript
 import * as fs from "fs";
 import * as util from "util";
-import trydo from "trydo";
+import dotry from "dotry";
 
 // These two examples are equivalent 
 (async () => {
     const getStat = util.promisify(fs.stat);
-    let [err, stat] = await trydo<Error, fs.Stats, [string]>(getStat, __filename);
+    let [err, stat] = await dotry<Error, fs.Stats, [string]>(getStat, __filename);
     // ...
 })();
 
@@ -182,7 +182,7 @@ import trydo from "trydo";
     let [
         err,
         stat
-    ] = await trydo.promisify<Error, fs.Stats, [string]>(fs.stat, __filename);
+    ] = await dotry.promisify<Error, fs.Stats, [string]>(fs.stat, __filename);
     // ...
 })();
 ```

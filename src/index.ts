@@ -2,27 +2,27 @@ import { isGenerator, isAsyncGenerator } from "check-iterable";
 
 // Declarations should be ordered from complex to simple.
 
-export default function trydo<E = any, R = any, A extends any[]= any[]>(
+export default function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
-export default function trydo<E = any, R = any, A extends any[]= any[]>(
+export default function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
-export default function trydo<E = any, R = any, A extends any[]= any[]>(
+export default function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
     ...args: A
 ): Promise<[E, R]>;
 
-export default function trydo<E = any, R = any, A extends any[]= any[]>(
+export default function dotry<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
     ...args: A
 ): [E, R];
 
-export default function trydo<E, R, A extends any[]>(
+export default function dotry<E, R, A extends any[]>(
     fn: (...args: A) => R,
     ...args: A
 ): [E, R] |
@@ -118,7 +118,7 @@ export default function trydo<E, R, A extends any[]>(
  * Calls a traditional Node.js error-first callback style function and returns
  * a promise wrapped on the result.
  */
-trydo.promisify = function promisify<E = any, R = any, A extends any[]= any[]>(
+dotry.promisify = function promisify<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: any[]) => any,
     ...args: A
 ): Promise<[E, R]> {

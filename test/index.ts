@@ -1,10 +1,10 @@
-import trydo from "../src";
+import dotry from "../src";
 import * as assert from "assert";
 import * as fs from "fs";
 
 const EmptyStringError = new Error("the string must not be empty");
 
-describe("trydo", () => {
+describe("dotry", () => {
     it("should invoke an regular function as expected", () => {
         function check(str: string) {
             if (str.length === 0) {
@@ -13,8 +13,8 @@ describe("trydo", () => {
             return str;
         }
 
-        let res = trydo(check, "Hello, World!");
-        let _res = trydo<Error, string, [string]>(check, "");
+        let res = dotry(check, "Hello, World!");
+        let _res = dotry<Error, string, [string]>(check, "");
         let [err, str] = res;
         let [_err, _str] = _res;
 
@@ -28,7 +28,7 @@ describe("trydo", () => {
 
     it("should wrap an regular function as expected", () => {
         function check(str: string) {
-            return trydo<Error, string>(() => {
+            return dotry<Error, string>(() => {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -57,8 +57,8 @@ describe("trydo", () => {
             return str;
         }
 
-        let res = trydo<Error, string, [string]>(check, "Hello, World!");
-        let _res = trydo<Error, string, [string]>(check, "");
+        let res = dotry<Error, string, [string]>(check, "Hello, World!");
+        let _res = dotry<Error, string, [string]>(check, "");
         let [err, str] = await res;
         let [_err, _str] = await _res;
 
@@ -72,7 +72,7 @@ describe("trydo", () => {
 
     it("should wrap an async function as expected", async () => {
         function check(str: string) {
-            return trydo<Error, string>(async () => {
+            return dotry<Error, string>(async () => {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -106,7 +106,7 @@ describe("trydo", () => {
             return "OK";
         }
 
-        let res = trydo<Error, string, [string]>(check, "Hello, World!");
+        let res = dotry<Error, string, [string]>(check, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -126,7 +126,7 @@ describe("trydo", () => {
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = trydo<Error, string, [string]>(check, "");
+        let _res = dotry<Error, string, [string]>(check, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -149,7 +149,7 @@ describe("trydo", () => {
 
     it("should wrap an generator function as expected", () => {
         function check(str: string) {
-            return trydo<Error, string>(function* () {
+            return dotry<Error, string>(function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -185,7 +185,7 @@ describe("trydo", () => {
 
     it("should pass value into the generator function as expected", () => {
         function check(str: string) {
-            return trydo<Error, string>(function* () {
+            return dotry<Error, string>(function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -234,7 +234,7 @@ describe("trydo", () => {
             return "OK";
         }
 
-        let res = trydo<Error, string, [string]>(check, "Hello, World!");
+        let res = dotry<Error, string, [string]>(check, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -254,7 +254,7 @@ describe("trydo", () => {
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = trydo(check, "");
+        let _res = dotry(check, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -277,7 +277,7 @@ describe("trydo", () => {
 
     it("should wrap an async generator function as expected", async () => {
         function check(str: string) {
-            return trydo<Error, string>(async function* () {
+            return dotry<Error, string>(async function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -313,7 +313,7 @@ describe("trydo", () => {
 
     it("should pass value into the async generator function as expected", async () => {
         function check(str: string) {
-            return trydo<Error, string>(async function* () {
+            return dotry<Error, string>(async function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -350,12 +350,12 @@ describe("trydo", () => {
     });
 });
 
-describe("trydo.promosify", () => {
+describe("dotry.promosify", () => {
     it("should return a promise of result as expected", async () => {
         let [
             err,
             stat
-        ] = await trydo.promisify<NodeJS.ErrnoException, fs.Stats, [string]>(
+        ] = await dotry.promisify<NodeJS.ErrnoException, fs.Stats, [string]>(
             fs.stat,
             __filename
         );
@@ -366,7 +366,7 @@ describe("trydo.promosify", () => {
         let [
             _err,
             _stat
-        ] = await trydo.promisify<NodeJS.ErrnoException, fs.Stats, [string]>(
+        ] = await dotry.promisify<NodeJS.ErrnoException, fs.Stats, [string]>(
             fs.stat,
             __filename + ".map"
         );
@@ -377,7 +377,7 @@ describe("trydo.promosify", () => {
     });
 
     it("should promisify a function without error argument as expected", async () => {
-        let [err, exists] = await trydo.promisify<null, boolean, [string]>(
+        let [err, exists] = await dotry.promisify<null, boolean, [string]>(
             fs.exists,
             __filename
         );
@@ -385,7 +385,7 @@ describe("trydo.promosify", () => {
         assert.strictEqual(err, null);
         assert.strictEqual(exists, true);
 
-        let [_err, _exists] = await trydo.promisify<null, boolean, [string]>(
+        let [_err, _exists] = await dotry.promisify<null, boolean, [string]>(
             fs.exists,
             __filename + ".map"
         );
@@ -398,7 +398,7 @@ describe("trydo.promosify", () => {
         let [
             err,
             res
-        ] = await trydo.promisify<NodeJS.ErrnoException, void, [string, number]>(
+        ] = await dotry.promisify<NodeJS.ErrnoException, void, [string, number]>(
             fs.access,
             __filename,
             fs.constants.F_OK
@@ -410,7 +410,7 @@ describe("trydo.promosify", () => {
         let [
             _err,
             _res
-        ] = await trydo.promisify<NodeJS.ErrnoException, void, [string, number]>(
+        ] = await dotry.promisify<NodeJS.ErrnoException, void, [string, number]>(
             fs.access,
             __filename + ".map",
             fs.constants.F_OK
@@ -436,7 +436,7 @@ describe("trydo.promosify", () => {
         let [
             err,
             data
-        ] = await trydo.promisify<Error, string[], [string[]]>(test, [
+        ] = await dotry.promisify<Error, string[], [string[]]>(test, [
             "Hello",
             "World"
         ]);
@@ -447,7 +447,7 @@ describe("trydo.promosify", () => {
         let [
             _err,
             _data
-        ] = await trydo.promisify<Error, string[], [string[]]>(test, []);
+        ] = await dotry.promisify<Error, string[], [string[]]>(test, []);
 
         assert.strictEqual(_err.name, "Error");
         assert.strictEqual(_err.message, "data can not be empty");
