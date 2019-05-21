@@ -10,6 +10,10 @@ And since it's well typed in TypeScript, it is easy to just pass any function
 to **trydo**, and TypeScript will automatically infer returning types of the
 result.
 
+Also, **trydo** only packs the potential error and the returning value into the
+form of `[err, res]`, it **DOES NOT** change the outlook of the original
+function.
+
 ## Install
 
 ```sh
