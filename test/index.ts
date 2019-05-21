@@ -1,10 +1,10 @@
 import * as assert from "assert";
 import trydo from "../src";
 
+const EmptyStringError = new Error("the string must not be empty");
+
 describe("trydo", () => {
     it("should invoke an regular function as expected", () => {
-        const EmptyStringError = new Error("the string must not be empty");
-
         function check(str: string) {
             if (str.length === 0) {
                 throw EmptyStringError;
@@ -12,8 +12,8 @@ describe("trydo", () => {
             return str;
         }
 
-        let res = trydo<Error, string>(check, void 0, "Hello, World!");
-        let _res = trydo<Error, string>(check, void 0, "");
+        let res = trydo(check, "Hello, World!");
+        let _res = trydo<Error, string, [string]>(check, "");
         let [err, str] = res;
         let [_err, _str] = _res;
 
@@ -25,32 +25,7 @@ describe("trydo", () => {
         assert.strictEqual(_str, undefined);
     });
 
-    it("should invoke an async function as expected", async () => {
-        const EmptyStringError = new Error("the string must not be empty");
-
-        async function check(str: string) {
-            if (str.length === 0) {
-                throw EmptyStringError;
-            }
-            return str;
-        }
-
-        let res = trydo<Error, string>(check, void 0, "Hello, World!");
-        let _res = trydo<Error, string>(check, void 0, "");
-        let [err, str] = await res;
-        let [_err, _str] = await _res;
-
-        assert(res instanceof Promise);
-        assert(_res instanceof Promise);
-        assert.strictEqual(err, null);
-        assert.strictEqual(str, "Hello, World!");
-        assert.strictEqual(_err, EmptyStringError);
-        assert.strictEqual(_str, undefined);
-    });
-
     it("should wrap an regular function as expected", () => {
-        const EmptyStringError = new Error("the string must not be empty");
-
         function check(str: string) {
             return trydo<Error, string>(() => {
                 if (str.length === 0) {
@@ -73,9 +48,28 @@ describe("trydo", () => {
         assert.strictEqual(_str, undefined);
     });
 
-    it("should wrap an async function as expected", async () => {
-        const EmptyStringError = new Error("the string must not be empty");
+    it("should invoke an async function as expected", async () => {
+        async function check(str: string) {
+            if (str.length === 0) {
+                throw EmptyStringError;
+            }
+            return str;
+        }
 
+        let res = trydo<Error, string, [string]>(check, "Hello, World!");
+        let _res = trydo<Error, string, [string]>(check, "");
+        let [err, str] = await res;
+        let [_err, _str] = await _res;
+
+        assert(res instanceof Promise);
+        assert(_res instanceof Promise);
+        assert.strictEqual(err, null);
+        assert.strictEqual(str, "Hello, World!");
+        assert.strictEqual(_err, EmptyStringError);
+        assert.strictEqual(_str, undefined);
+    });
+
+    it("should wrap an async function as expected", async () => {
         function check(str: string) {
             return trydo<Error, string>(async () => {
                 if (str.length === 0) {
@@ -98,125 +92,7 @@ describe("trydo", () => {
         assert.strictEqual(_str, undefined);
     });
 
-    it("should invoke an regular function with thisArg as expected", () => {
-        const StringNotEqaulError = new Error("the string must not be empty");
-
-        class Test {
-            str = "Hello, World!";
-
-            check(str: string) {
-                if (str !== this.str) {
-                    throw StringNotEqaulError;
-                }
-                return this.str;
-            }
-        }
-
-        let test = new Test();
-        let res = trydo<Error, string>(test.check, test, "Hello, World!");
-        let _res = trydo<Error, string>(test.check, test, "");
-        let [err, str] = res;
-        let [_err, _str] = _res;
-
-        assert.strictEqual(res.length, 2);
-        assert.strictEqual(_res.length, 2);
-        assert.strictEqual(err, null);
-        assert.strictEqual(str, "Hello, World!");
-        assert.strictEqual(_err, StringNotEqaulError);
-        assert.strictEqual(_str, undefined);
-    });
-
-    it("should invoke an async function with thisArg as expected", async () => {
-        const StringNotEqaulError = new Error("the string must not be empty");
-
-        class Test {
-            str = "Hello, World!";
-
-            async check(str: string) {
-                if (str !== this.str) {
-                    throw StringNotEqaulError;
-                }
-                return this.str;
-            }
-        }
-
-        let test = new Test();
-        let res = trydo<Error, string>(test.check, test, "Hello, World!");
-        let _res = trydo<Error, string>(test.check, test, "");
-        let [err, str] = await res;
-        let [_err, _str] = await _res;
-
-        assert(res instanceof Promise);
-        assert(_res instanceof Promise);
-        assert.strictEqual(err, null);
-        assert.strictEqual(str, "Hello, World!");
-        assert.strictEqual(_err, StringNotEqaulError);
-        assert.strictEqual(_str, undefined);
-    });
-
-    it("should wrap an regular function with thisArg as expected", () => {
-        const StringNotEqaulError = new Error("the string must not be empty");
-
-        class Test {
-            str = "Hello, World!";
-
-            check(str: string) {
-                return trydo<Error, string>(function (this: Test) {
-                    if (str !== this.str) {
-                        throw StringNotEqaulError;
-                    }
-                    return this.str;
-                }, this);
-            }
-        }
-
-        let test = new Test();
-        let res = test.check("Hello, World!");
-        let _res = test.check("");
-        let [err, str] = res;
-        let [_err, _str] = _res;
-
-        assert.strictEqual(res.length, 2);
-        assert.strictEqual(_res.length, 2);
-        assert.strictEqual(err, null);
-        assert.strictEqual(str, "Hello, World!");
-        assert.strictEqual(_err, StringNotEqaulError);
-        assert.strictEqual(_str, undefined);
-    });
-
-    it("should wrap an async function with thisArg as expected", async () => {
-        const StringNotEqaulError = new Error("the string must not be empty");
-
-        class Test {
-            str = "Hello, World!";
-
-            check(str: string) {
-                return trydo<Error, string>(async function (this: Test) {
-                    if (str !== this.str) {
-                        throw StringNotEqaulError;
-                    }
-                    return this.str;
-                }, this);
-            }
-        }
-
-        let test = new Test();
-        let res = test.check("Hello, World!");
-        let _res = test.check("");
-        let [err, str] = await res;
-        let [_err, _str] = await _res;
-
-        assert(res instanceof Promise);
-        assert(_res instanceof Promise);
-        assert.strictEqual(err, null);
-        assert.strictEqual(str, "Hello, World!");
-        assert.strictEqual(_err, StringNotEqaulError);
-        assert.strictEqual(_str, undefined);
-    });
-
     it("should invoke an generator function as expected", () => {
-        const EmptyStringError = new Error("the string must not be empty");
-
         function* check(str: string) {
             if (str.length === 0) {
                 throw EmptyStringError;
@@ -229,7 +105,7 @@ describe("trydo", () => {
             return "OK";
         }
 
-        let res = trydo<Error, string>(check, void 0, "Hello, World!");
+        let res = trydo<Error, string, [string]>(check, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -246,11 +122,10 @@ describe("trydo", () => {
             }
         }
 
-
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = trydo<Error, string>(check, void 0, "");
+        let _res = trydo<Error, string, [string]>(check, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -271,9 +146,81 @@ describe("trydo", () => {
         assert.strictEqual(_str, "");
     });
 
-    it("should invoke an async generator function as expected", async () => {
-        const EmptyStringError = new Error("the string must not be empty");
+    it("should wrap an generator function as expected", () => {
+        function check(str: string) {
+            return trydo<Error, string>(function* () {
+                if (str.length === 0) {
+                    throw EmptyStringError;
+                }
 
+                for (let x of str) {
+                    yield x;
+                }
+
+                return "OK";
+            });
+        }
+
+        let res = check("Hello, World!");
+        let str = "";
+        let errors: Error[] = [];
+
+        while (true) {
+            let { value: [err, x], done } = res.next();
+
+            if (done) {
+                x !== undefined && (str += x);
+                break;
+            } else if (err) {
+                errors.push(err);
+            } else {
+                str += x;
+            }
+        }
+
+        assert.deepStrictEqual(errors, []);
+        assert.strictEqual(str, "Hello, World!OK");
+    });
+
+    it("should pass value into the generator function as expected", () => {
+        function check(str: string) {
+            return trydo<Error, string>(function* () {
+                if (str.length === 0) {
+                    throw EmptyStringError;
+                }
+
+                let count = 0;
+
+                for (let x of str) {
+                    count += yield x;
+                }
+
+                return String(count);
+            });
+        }
+
+        let res = check("Hello, World!");
+        let str = "";
+        let errors: Error[] = [];
+
+        while (true) {
+            let { value: [err, x], done } = res.next(1);
+
+            if (done) {
+                x !== undefined && (str += x);
+                break;
+            } else if (err) {
+                errors.push(err);
+            } else {
+                str += x;
+            }
+        }
+
+        assert.deepStrictEqual(errors, []);
+        assert.strictEqual(str, "Hello, World!13");
+    });
+
+    it("should invoke an async generator function as expected", async () => {
         async function* check(str: string) {
             if (str.length === 0) {
                 throw EmptyStringError;
@@ -286,7 +233,7 @@ describe("trydo", () => {
             return "OK";
         }
 
-        let res = trydo<Error, string>(check, void 0, "Hello, World!");
+        let res = trydo<Error, string, [string]>(check, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -303,11 +250,10 @@ describe("trydo", () => {
             }
         }
 
-
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = trydo<Error, string>(check, void 0, "");
+        let _res = trydo(check, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -326,5 +272,79 @@ describe("trydo", () => {
 
         assert.deepStrictEqual(_errors, [EmptyStringError]);
         assert.strictEqual(_str, "");
+    });
+
+    it("should wrap an async generator function as expected", async () => {
+        function check(str: string) {
+            return trydo<Error, string>(async function* () {
+                if (str.length === 0) {
+                    throw EmptyStringError;
+                }
+
+                for (let x of str) {
+                    yield x;
+                }
+
+                return "OK";
+            });
+        }
+
+        let res = check("Hello, World!");
+        let str = "";
+        let errors: Error[] = [];
+
+        while (true) {
+            let { value: [err, x], done } = await res.next();
+
+            if (done) {
+                x !== undefined && (str += x);
+                break;
+            } else if (err) {
+                errors.push(err);
+            } else {
+                str += x;
+            }
+        }
+
+        assert.deepStrictEqual(errors, []);
+        assert.strictEqual(str, "Hello, World!OK");
+    });
+
+    it("should pass value into the async generator function as expected", async () => {
+        function check(str: string) {
+            return trydo<Error, string>(async function* () {
+                if (str.length === 0) {
+                    throw EmptyStringError;
+                }
+
+                let count = 0;
+
+                for (let x of str) {
+                    count += yield x;
+                }
+
+                return String(count);
+            });
+        }
+
+        let res = check("Hello, World!");
+        let str = "";
+        let errors: Error[] = [];
+
+        while (true) {
+            let { value: [err, x], done } = await res.next(1);
+
+            if (done) {
+                x !== undefined && (str += x);
+                break;
+            } else if (err) {
+                errors.push(err);
+            } else {
+                str += x;
+            }
+        }
+
+        assert.deepStrictEqual(errors, []);
+        assert.strictEqual(str, "Hello, World!13");
     });
 });

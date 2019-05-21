@@ -25,7 +25,7 @@ import trydo from "trydo";
 // TypeScript cannot auto infer error types, we must provided them as the first
 // type argument of `trydo`, and the second argument as the returning type.
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = trydo<Error, string>(check, void 0, "Hello, World!");
+let [err, res] = trydo<Error, string>(check, "Hello, World!");
 function check(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -36,7 +36,7 @@ function check(str: string) {
 
 // An async function
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = await trydo<Error, string>(checkAsync, void 0, "Hello, World!");
+let [err, res] = await trydo<Error, string>(checkAsync, "Hello, World!");
 async function checkAsync(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -56,7 +56,7 @@ function* iterate(data: number[]) {
 }
 
 // `err` will be of type `RangeError`, and `value` will be of type `number`.
-for (let [err, value] of trydo<RangeError, number>(iterate, void 0, 1, 2, 3, 4)) {
+for (let [err, value] of trydo<RangeError, number>(iterate, 1, 2, 3, 4)) {
     // ...
 }
 
@@ -71,7 +71,7 @@ async function* iterateAsync(data: number[]) {
     }
 }
 
-let iterator = trydo<RangeError, number>(iterate, void 0, 1, 2, 3, 4);
+let iterator = trydo<RangeError, number>(iterate, 1, 2, 3, 4);
 for await (let [err, value] of iterator) {
     // ...
 }
@@ -79,8 +79,8 @@ for await (let [err, value] of iterator) {
 
 ## More Well-formed
 
-Instead of every time invoking the function by calling `trydo<Error, string>()` explicitly, it
-is recommended to wrap the function body instead.
+Instead of every time invoking the function by calling `trydo<Error, string>()`
+explicitly, it is recommended to wrap the function body instead.
 
 ```typescript
 function check(str: string) {
@@ -131,25 +131,21 @@ function iterateAsync(data: number[]) {
 ```typescript
 function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
-    thisArg?: any,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
 function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
-    thisArg?: any,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
 function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
-    thisArg?: any,
     ...args: A
 ): Promise<[E, R]>;
 
 function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
-    thisArg?: any,
     ...args: A
 ): [E, R];
 ```
@@ -157,44 +153,3 @@ function trydo<E = any, R = any, A extends any[]= any[]>(
 All these signatures will pack the result of the input function (`fn`) to an 
 two-element array which the first element is the potential error and the second
 element is the returning value (or iterating value).
-
-Also, **trydo** allows you passing `thisArg` and arbitrary number of arguments
-into the main function, which is very useful most of the times, especially in a
-class method.
-
-```typescript
-class Test {
-    doSomething(action: string, data: string[]) {
-        return trydo<Error, string>(function (this: Test) {
-            // ...
-        }, this);
-    }
-
-    // is equalvelent to
-    doSomething2(action: string, data: string[]) {
-        return trydo<Error, string>(() => {
-            // ...
-        });
-    }
-
-    // However, when it comes to generators, you have to use keyword `function`
-    // and pass the `thisArg`.
-    doSomething3(action: string, data: string[]) {
-        return trydo<Error, string>(function* (this: Test) {
-            // ...
-        }, this);
-    }
-
-    doSomething4(action: string, data: string[]) {
-        return trydo<Error, string>(async function* (this: Test) {
-            // ...
-        }, this);
-    }
-}
-
-// Then all these methods are packed with the form of [err, res], you can call
-// them directly.
-
-let test = new Test();
-let [err, res] = test.doSomething();
-```

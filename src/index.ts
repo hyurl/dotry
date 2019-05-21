@@ -4,31 +4,26 @@ import { isGenerator, isAsyncGenerator } from "check-iterable";
 
 export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
-    thisArg?: any,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
 export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
-    thisArg?: any,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
 export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
-    thisArg?: any,
     ...args: A
 ): Promise<[E, R]>;
 
 export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
-    thisArg?: any,
     ...args: A
 ): [E, R];
 
 export default function trydo<E, R, A extends any[]>(
     fn: (...args: A) => R,
-    thisArg = undefined,
     ...args: A
 ): [E, R] |
     Promise<[E, R]> |
@@ -36,12 +31,13 @@ export default function trydo<E, R, A extends any[]>(
     AsyncIterableIterator<[E, R]> {
 
     try {
-        let res = fn.apply(thisArg, args);
+        let res = fn.apply(void 0, args);
 
         // Implementation details should be ordered from complex to simple.
 
         if (isAsyncGenerator(res)) {
             return (async function* () {
+                let input = undefined;
                 let result: any;
 
                 // Use `while` loop instead of `for...of...` in order to
@@ -51,13 +47,16 @@ export default function trydo<E, R, A extends any[]>(
                         let {
                             done,
                             value
-                        } = await (<AsyncIterableIterator<any>>res).next();
+                        } = await (<AsyncIterableIterator<any>>res).next(input);
 
                         if (done) {
                             result = value;
                             break;
                         } else {
-                            yield Promise.resolve([null, value]);
+                            // Receive any potential input value that passed to
+                            // the outer `next()` call, and pass them to
+                            // `res.next()` in the next call.
+                            input = yield Promise.resolve([null, value]);
                         }
                     } catch (err) {
                         // If any error occurs, yield that error as resolved and
@@ -72,6 +71,7 @@ export default function trydo<E, R, A extends any[]>(
             })() as AsyncIterableIterator<[E, R]>;
         } else if (isGenerator(res)) {
             return (function* () {
+                let input = undefined;
                 let result: any;
 
                 while (true) {
@@ -79,13 +79,13 @@ export default function trydo<E, R, A extends any[]>(
                         let {
                             done,
                             value
-                        } = (<IterableIterator<any>>res).next();
+                        } = (<IterableIterator<any>>res).next(input);
 
                         if (done) {
                             result = value;
                             break;
                         } else {
-                            yield [null, value];
+                            input = yield [null, value];
                         }
                     } catch (err) {
                         yield [err, undefined];
@@ -99,9 +99,8 @@ export default function trydo<E, R, A extends any[]>(
             res = res.then((value: any) => [null, value]);
 
             // There is no guarantee that a promise-like object's `then()`
-            // method
-            // will always return a promise, to avoid any trouble, we need to do
-            // one more check.
+            // method will always return a promise, to avoid any trouble, we
+            // need to do one more check.
             if (typeof res.catch === "function") {
                 return res.catch((err: any) => [err, undefined]);
             } else {
