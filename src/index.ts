@@ -2,38 +2,38 @@ import { isGenerator, isAsyncGenerator } from "check-iterable";
 
 // Declarations should be ordered from complex to simple.
 
-export default function trydo<E extends Error, R, A extends any[]= any[]>(
+export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
     thisArg?: any,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
-export default function trydo<E extends Error, R, A extends any[]= any[]>(
+export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
     thisArg?: any,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
-export default function trydo<E extends Error, R, A extends any[]= any[]>(
+export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
     thisArg?: any,
     ...args: A
 ): Promise<[E, R]>;
 
-export default function trydo<E extends Error, R, A extends any[]= any[]>(
+export default function trydo<E = any, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
     thisArg?: any,
     ...args: A
 ): [E, R];
 
-export default function trydo(
-    fn: (...args: any[]) => any,
+export default function trydo<E, R, A extends any[]>(
+    fn: (...args: A) => R,
     thisArg = undefined,
-    ...args: any[]
-): [Error, any] |
-    Promise<[Error, any]> |
-    IterableIterator<[Error, any]> |
-    AsyncIterableIterator<[Error, any]> {
+    ...args: A
+): [E, R] |
+    Promise<[E, R]> |
+    IterableIterator<[E, R]> |
+    AsyncIterableIterator<[E, R]> {
 
     try {
         let res = fn.apply(thisArg, args);
@@ -69,7 +69,7 @@ export default function trydo(
                 }
 
                 return Promise.resolve([null, result]);
-            })() as AsyncIterableIterator<[Error, any]>;
+            })() as AsyncIterableIterator<[E, R]>;
         } else if (isGenerator(res)) {
             return (function* () {
                 let result: any;
@@ -94,7 +94,7 @@ export default function trydo(
                 }
 
                 return [null, result];
-            })() as IterableIterator<[Error, any]>;
+            })() as IterableIterator<[E, R]>;
         } else if (typeof res.then === "function") {
             res = res.then((value: any) => [null, value]);
 

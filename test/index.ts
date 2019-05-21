@@ -12,8 +12,8 @@ describe("trydo", () => {
             return str;
         }
 
-        let res = trydo(check, void 0, "Hello, World!");
-        let _res = trydo(check, void 0, "");
+        let res = trydo<Error, string>(check, void 0, "Hello, World!");
+        let _res = trydo<Error, string>(check, void 0, "");
         let [err, str] = res;
         let [_err, _str] = _res;
 
@@ -35,8 +35,8 @@ describe("trydo", () => {
             return str;
         }
 
-        let res = trydo(check, void 0, "Hello, World!");
-        let _res = trydo(check, void 0, "");
+        let res = trydo<Error, string>(check, void 0, "Hello, World!");
+        let _res = trydo<Error, string>(check, void 0, "");
         let [err, str] = await res;
         let [_err, _str] = await _res;
 
@@ -52,7 +52,7 @@ describe("trydo", () => {
         const EmptyStringError = new Error("the string must not be empty");
 
         function check(str: string) {
-            return trydo(() => {
+            return trydo<Error, string>(() => {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -77,7 +77,7 @@ describe("trydo", () => {
         const EmptyStringError = new Error("the string must not be empty");
 
         function check(str: string) {
-            return trydo(async () => {
+            return trydo<Error, string>(async () => {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -113,8 +113,8 @@ describe("trydo", () => {
         }
 
         let test = new Test();
-        let res = trydo(test.check, test, "Hello, World!");
-        let _res = trydo(test.check, test, "");
+        let res = trydo<Error, string>(test.check, test, "Hello, World!");
+        let _res = trydo<Error, string>(test.check, test, "");
         let [err, str] = res;
         let [_err, _str] = _res;
 
@@ -141,8 +141,8 @@ describe("trydo", () => {
         }
 
         let test = new Test();
-        let res = trydo(test.check, test, "Hello, World!");
-        let _res = trydo(test.check, test, "");
+        let res = trydo<Error, string>(test.check, test, "Hello, World!");
+        let _res = trydo<Error, string>(test.check, test, "");
         let [err, str] = await res;
         let [_err, _str] = await _res;
 
@@ -161,7 +161,7 @@ describe("trydo", () => {
             str = "Hello, World!";
 
             check(str: string) {
-                return trydo(function (this: Test) {
+                return trydo<Error, string>(function (this: Test) {
                     if (str !== this.str) {
                         throw StringNotEqaulError;
                     }
@@ -191,7 +191,7 @@ describe("trydo", () => {
             str = "Hello, World!";
 
             check(str: string) {
-                return trydo(async function (this: Test) {
+                return trydo<Error, string>(async function (this: Test) {
                     if (str !== this.str) {
                         throw StringNotEqaulError;
                     }
@@ -229,7 +229,7 @@ describe("trydo", () => {
             return "OK";
         }
 
-        let res = trydo(check, void 0, "Hello, World!");
+        let res = trydo<Error, string>(check, void 0, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -250,7 +250,7 @@ describe("trydo", () => {
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = trydo(check, void 0, "");
+        let _res = trydo<Error, string>(check, void 0, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -286,7 +286,7 @@ describe("trydo", () => {
             return "OK";
         }
 
-        let res = trydo(check, void 0, "Hello, World!");
+        let res = trydo<Error, string>(check, void 0, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -307,7 +307,7 @@ describe("trydo", () => {
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = trydo(check, void 0, "");
+        let _res = trydo<Error, string>(check, void 0, "");
         let _str = "";
         let _errors: Error[] = [];
 
