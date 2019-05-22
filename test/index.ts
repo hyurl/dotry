@@ -149,7 +149,7 @@ describe("dotry", () => {
 
     it("should wrap an generator function as expected", () => {
         function check(str: string) {
-            return dotry<Error>(function* () {
+            return dotry(function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }

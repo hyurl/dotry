@@ -179,7 +179,7 @@ import dotry from "dotry";
 // These two examples are equivalent 
 (async () => {
     const getStat = util.promisify(fs.stat);
-    let [err, stat] = await dotry<Error, fs.Stats, [string]>(getStat, __filename);
+    let [err, stat] = await dotry(getStat, __filename);
     // ...
 })();
 

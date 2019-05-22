@@ -121,7 +121,7 @@ namespace dotry {
      * Calls a traditional Node.js error-first callback style function and returns
      * a promise wrapped on the result.
      */
-    export function promisify<E, R, A extends any[]= any[]>(
+    export function promisify<E = Error, R = any, A extends any[]= any[]>(
         fn: (...args: any[]) => any,
         ...args: A
     ): Promise<[E, R]> {
