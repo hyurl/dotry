@@ -138,12 +138,12 @@ function iterateAsync(data: number[]) {
 function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
     ...args: A
-): AsyncIterableIterator<[Error, R]>;
+): AsyncIterableIterator<[E, R]>;
 
 function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
     ...args: A
-): IterableIterator<[Error, R]>;
+): IterableIterator<[E, R]>;
 
 function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
