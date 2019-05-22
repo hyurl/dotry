@@ -25,10 +25,8 @@ npm i dotry
 import dotry from "dotry";
 
 // A regular function
-// TypeScript cannot auto infer error types, we must provided them as the first
-// type argument of `dotry`, and the second argument as the return type.
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = dotry<Error, string>(check, "Hello, World!");
+let [err, res] = dotry(check, "Hello, World!");
 function check(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -40,7 +38,7 @@ function check(str: string) {
 // An async function
 // Just for simplicity, don't forget to code in an async function on your own.
 // `err` will be of type `Error` and `res` will be of type `string`
-let [err, res] = await dotry<Error, string>(checkAsync, "Hello, World!");
+let [err, res] = await dotry(checkAsync, "Hello, World!");
 async function checkAsync(str: string) {
     if (str.length === 0) {
         throw new Error("the string must not be empty");
@@ -59,6 +57,8 @@ function* iterate(data: number[]) {
     }
 }
 
+// TypeScript cannot auto infer error types, we must provided them as the first
+// type argument of `dotry`, and the second argument as the return type.
 // `err` will be of type `RangeError`, and `value` will be of type `number`.
 for (let [err, value] of dotry<RangeError, number>(iterate, 1, 2, 3, 4)) {
     // ...
@@ -85,12 +85,12 @@ for await (let [err, value] of iterator) {
 
 ## More Well-formed
 
-Instead of every time invoking the function by calling `dotry<Error, string>()`
+Instead of every time invoking the function by calling `dotry()`
 explicitly, it is recommended to wrap the function body instead.
 
 ```typescript
 function check(str: string) {
-    return dotry<Error, string>(() => {
+    return dotry(() => {
         if (str.length === 0) {
             throw new Error("the string must not be empty");
         }
@@ -99,7 +99,7 @@ function check(str: string) {
 }
 
 function checkAsync(str: string) {
-    return dotry<Error, string>(async () => {
+    return dotry(async () => {
         if (str.length === 0) {
             throw new Error("the string must not be empty");
         }
@@ -135,22 +135,22 @@ function iterateAsync(data: number[]) {
 ## API
 
 ```typescript
-function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
-function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
-function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
     ...args: A
 ): Promise<[E, R]>;
 
-function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
     ...args: A
 ): [E, R];

@@ -1,28 +1,30 @@
 import { isGenerator, isAsyncGenerator } from "check-iterable";
 
+export default dotry;
+
 // Declarations should be ordered from complex to simple.
 
-export default function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => AsyncIterableIterator<R>,
     ...args: A
 ): AsyncIterableIterator<[Error, R]>;
 
-export default function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => IterableIterator<R>,
     ...args: A
 ): IterableIterator<[Error, R]>;
 
-export default function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => Promise<R>,
     ...args: A
 ): Promise<[E, R]>;
 
-export default function dotry<E = any, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[]= any[]>(
     fn: (...args: A) => R,
     ...args: A
 ): [E, R];
 
-export default function dotry<E, R, A extends any[]>(
+function dotry<E, R, A extends any[]>(
     fn: (...args: A) => R,
     ...args: A
 ): [E, R] |
@@ -114,29 +116,31 @@ export default function dotry<E, R, A extends any[]>(
     }
 }
 
-/**
- * Calls a traditional Node.js error-first callback style function and returns
- * a promise wrapped on the result.
- */
-dotry.promisify = function promisify<E = any, R = any, A extends any[]= any[]>(
-    fn: (...args: any[]) => any,
-    ...args: A
-): Promise<[E, R]> {
-    return new Promise((resolve: ([E, R]) => void) => {
-        fn.call(void 0, ...args, function (err: Error, ...values: any[]) {
-            if (arguments.length === 1 &&
-                err !== null && err !== undefined && !(err instanceof Error)) {
-                // In this case, err is not an error. e.g. fs.exists.
-                resolve([null, err] as [E, R]);
-            } else if (err) {
-                resolve([err, undefined]);
-            } else {
-                if (values.length > 1) {
-                    resolve([null, values] as [E, any]);
+namespace dotry {
+    /**
+     * Calls a traditional Node.js error-first callback style function and returns
+     * a promise wrapped on the result.
+     */
+    export function promisify<E, R, A extends any[]= any[]>(
+        fn: (...args: any[]) => any,
+        ...args: A
+    ): Promise<[E, R]> {
+        return new Promise((resolve: (value: [E, R]) => void) => {
+            fn.call(void 0, ...args, function (err: E, ...values: any[]) {
+                if (arguments.length === 1 && err !== null && err !== undefined
+                    && !(err instanceof Error)) {
+                    // In this case, err is not an error. e.g. fs.exists.
+                    resolve([null, <any>err]);
+                } else if (err) {
+                    resolve([err, undefined]);
                 } else {
-                    resolve([null, values[0]]);
+                    if (values.length > 1) {
+                        resolve([null, <any>values]);
+                    } else {
+                        resolve([null, values[0]]);
+                    }
                 }
-            }
+            });
         });
-    });
-};
+    };
+}

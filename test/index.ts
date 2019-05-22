@@ -13,8 +13,8 @@ describe("dotry", () => {
             return str;
         }
 
-        let res = dotry<Error, string, [string]>(check, "Hello, World!");
-        let _res = dotry<Error, string, [string]>(check, "");
+        let res = dotry(check, "Hello, World!");
+        let _res = dotry(check, "");
         let [err, str] = res;
         let [_err, _str] = _res;
 
@@ -28,7 +28,7 @@ describe("dotry", () => {
 
     it("should wrap an regular function as expected", () => {
         function check(str: string) {
-            return dotry<Error, string>(() => {
+            return dotry(() => {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -57,8 +57,8 @@ describe("dotry", () => {
             return str;
         }
 
-        let res = dotry<Error, string, [string]>(check, "Hello, World!");
-        let _res = dotry<Error, string, [string]>(check, "");
+        let res = dotry(check, "Hello, World!");
+        let _res = dotry(check, "");
         let [err, str] = await res;
         let [_err, _str] = await _res;
 
@@ -72,7 +72,7 @@ describe("dotry", () => {
 
     it("should wrap an async function as expected", async () => {
         function check(str: string) {
-            return dotry<Error, string>(async () => {
+            return dotry(async () => {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -106,7 +106,7 @@ describe("dotry", () => {
             return "OK";
         }
 
-        let res = dotry<Error, string, [string]>(check, "Hello, World!");
+        let res = dotry(check, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -126,7 +126,7 @@ describe("dotry", () => {
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = dotry<Error, string, [string]>(check, "");
+        let _res = dotry(check, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -149,7 +149,7 @@ describe("dotry", () => {
 
     it("should wrap an generator function as expected", () => {
         function check(str: string) {
-            return dotry<Error, string>(function* () {
+            return dotry<Error>(function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -185,7 +185,7 @@ describe("dotry", () => {
 
     it("should pass value into the generator function as expected", () => {
         function check(str: string) {
-            return dotry<Error, string>(function* () {
+            return dotry(function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -234,7 +234,7 @@ describe("dotry", () => {
             return "OK";
         }
 
-        let res = dotry<Error, string, [string]>(check, "Hello, World!");
+        let res = dotry(check, "Hello, World!");
         let str = "";
         let errors: Error[] = [];
 
@@ -254,7 +254,7 @@ describe("dotry", () => {
         assert.deepStrictEqual(errors, []);
         assert.strictEqual(str, "Hello, World!OK");
 
-        let _res = dotry<Error, string, [string]>(check, "");
+        let _res = dotry(check, "");
         let _str = "";
         let _errors: Error[] = [];
 
@@ -277,7 +277,7 @@ describe("dotry", () => {
 
     it("should wrap an async generator function as expected", async () => {
         function check(str: string) {
-            return dotry<Error, string>(async function* () {
+            return dotry(async function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -313,7 +313,7 @@ describe("dotry", () => {
 
     it("should pass value into the async generator function as expected", async () => {
         function check(str: string) {
-            return dotry<Error, string>(async function* () {
+            return dotry(async function* () {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
