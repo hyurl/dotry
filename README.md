@@ -160,6 +160,11 @@ All these signatures will pack the result of the input function (`fn`) to an
 two-element array which the first element is the potential error and the second
 element is the return value (or yield value).
 
+It is worth mentioned that once you set the `E` argument explicitly, you should
+only throw error that is of the type `E`, and only return a value that is of
+type `R`. Otherwise, you should only throw type `Error` and the type of return
+value will be auto-inferred.
+
 ## Dealing With Traditional Callback Style Functions
 
 There are two ways to deal with traditional callback style functions, use
