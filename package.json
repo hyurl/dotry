@@ -1,6 +1,6 @@
 {
   "name": "dotry",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Typed error-first try-catch convention of functions.",
   "main": "dist/index.js",
   "types": "src/index.ts",
