@@ -135,22 +135,22 @@ function iterateAsync(data: number[]) {
 ## API
 
 ```typescript
-function dotry<E = Error, R = any, A extends any[]= any[]>(
-    fn: (...args: A) => AsyncIterableIterator<R>,
+function dotry<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
+    fn: (...args: A) => AsyncGenerator<T, TReturn, TNext>,
     ...args: A
-): AsyncIterableIterator<[E, R]>;
+): AsyncGenerator<[E, T], [E, TReturn], TNext>;
 
-function dotry<E = Error, R = any, A extends any[]= any[]>(
-    fn: (...args: A) => IterableIterator<R>,
+function dotry<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
+    fn: (...args: A) => Generator<T, TReturn, TNext>,
     ...args: A
-): IterableIterator<[E, R]>;
+): Generator<[E, T], [E, TReturn], TNext>;
 
-function dotry<E = Error, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[] = any[]>(
     fn: (...args: A) => Promise<R>,
     ...args: A
 ): Promise<[E, R]>;
 
-function dotry<E = Error, R = any, A extends any[]= any[]>(
+function dotry<E = Error, R = any, A extends any[] = any[]>(
     fn: (...args: A) => R,
     ...args: A
 ): [E, R];
@@ -162,8 +162,8 @@ element is the return value (or yield value).
 
 It is worth mentioned that once you set the `E` argument explicitly, you should
 only throw error that is of the type `E`, and only return a value that is of
-type `R`. Otherwise, you should only throw type `Error` and the type of return
-value will be auto-inferred.
+type `R` or `T`. Otherwise, you should only throw type `Error` and the type of
+return value will be auto-inferred.
 
 ## Dealing With Traditional Callback Style Functions
 

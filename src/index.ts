@@ -2,16 +2,16 @@ import { isGenerator, isAsyncGenerator } from "check-iterable";
 
 export default dotry;
 
-// Declarations should be ordered from complex to simple.
+// Declarations need be ordered from complex to simple.
 
-function dotry<E = Error, R = any, A extends any[] = any[]>(
-    fn: (...args: A) => AsyncIterableIterator<R>,
+function dotry<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
+    fn: (...args: A) => AsyncGenerator<T, TReturn, TNext>,
     ...args: A
-): AsyncIterableIterator<[E, R]>;
-function dotry<E = Error, R = any, A extends any[] = any[]>(
-    fn: (...args: A) => IterableIterator<R>,
+): AsyncGenerator<[E, T], [E, TReturn], TNext>;
+function dotry<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
+    fn: (...args: A) => Generator<T, TReturn, TNext>,
     ...args: A
-): IterableIterator<[E, R]>;
+): Generator<[E, T], [E, TReturn], TNext>;
 function dotry<E = Error, R = any, A extends any[] = any[]>(
     fn: (...args: A) => Promise<R>,
     ...args: A
@@ -52,16 +52,16 @@ namespace dotry {
         });
     };
 
-    export function call<E = Error, R = any, A extends any[] = any[]>(
+    export function call<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
         thisArg: any,
-        fn: (...args: A) => AsyncIterableIterator<R>,
+        fn: (...args: A) => AsyncGenerator<T, TReturn, TNext>,
         ...args: A
-    ): AsyncIterableIterator<[E, R]>;
-    export function call<E = Error, R = any, A extends any[] = any[]>(
+    ): AsyncGenerator<[E, T], [E, TReturn], TNext>;
+    export function call<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
         thisArg: any,
-        fn: (...args: A) => IterableIterator<R>,
+        fn: (...args: A) => Generator<T, TReturn, TNext>,
         ...args: A
-    ): IterableIterator<[E, R]>;
+    ): Generator<[E, T], [E, TReturn], TNext>;
     export function call<E = Error, R = any, A extends any[] = any[]>(
         thisArg: any,
         fn: (...args: A) => Promise<R>,
@@ -76,16 +76,16 @@ namespace dotry {
         return apply(thisArg, <any>fn, args) as any;
     }
 
-    export function apply<E = Error, R = any, A extends any[] = any[]>(
+    export function apply<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
         thisArg: any,
-        fn: (...args: A) => AsyncIterableIterator<R>,
+        fn: (...args: A) => AsyncGenerator<true, TReturn, TNext>,
         args: A
-    ): AsyncIterableIterator<[E, R]>;
-    export function apply<E = Error, R = any, A extends any[] = any[]>(
+    ): AsyncGenerator<[E, T], [E, TReturn], TNext>;
+    export function apply<E = Error, T = any, A extends any[] = any[], TReturn = any, TNext = unknown>(
         thisArg: any,
-        fn: (...args: A) => IterableIterator<R>,
+        fn: (...args: A) => Generator<true, TReturn, TNext>,
         args: A
-    ): IterableIterator<[E, R]>;
+    ): Generator<[E, T], [E, TReturn], TNext>;
     export function apply<E = Error, R = any, A extends any[] = any[]>(
         thisArg: any,
         fn: (...args: A) => Promise<R>,
@@ -162,13 +162,13 @@ namespace dotry {
 
                     return [null, result];
                 })() as IterableIterator<any>;
-            } else if (typeof res.then === "function") {
+            } else if (typeof res?.then === "function") {
                 res = res.then((value: any) => [null, value]);
 
                 // There is no guarantee that a promise-like object's `then()`
                 // method will always return a promise, to avoid any trouble, we
                 // need to do one more check.
-                if (typeof res.catch === "function") {
+                if (typeof res?.catch === "function") {
                     return res.catch((err: any) => [err, undefined]);
                 } else {
                     return res;

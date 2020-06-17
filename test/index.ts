@@ -185,7 +185,7 @@ describe("dotry", () => {
 
     it("should pass value into the generator function as expected", () => {
         function check(str: string) {
-            return dotry(function* () {
+            return dotry(function* (): Generator<string, string, number> {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -313,7 +313,7 @@ describe("dotry", () => {
 
     it("should pass value into the async generator function as expected", async () => {
         function check(str: string) {
-            return dotry(async function* () {
+            return dotry(async function* (): AsyncGenerator<string, string, number> {
                 if (str.length === 0) {
                     throw EmptyStringError;
                 }
@@ -452,5 +452,13 @@ describe("dotry.promisify", () => {
         assert.strictEqual(_err.name, "Error");
         assert.strictEqual(_err.message, "data can not be empty");
         assert.strictEqual(_data, undefined);
+    });
+
+    it("should work well when the test function returns void", () => {
+        let [err1, res1] = dotry(() => { });
+        let [err2, res2] = dotry(() => null);
+
+        assert(err1 === null && res1 === void 0);
+        assert(err2 === null && res2 === null);
     });
 });

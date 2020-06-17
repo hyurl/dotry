@@ -1,11 +1,12 @@
 {
   "name": "dotry",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Typed error-first try-catch convention of functions.",
   "main": "dist/index.js",
   "types": "src/index.ts",
   "scripts": {
     "prepublish": "tsc",
+    "pretest": "npm link typescript",
     "test": "mocha --exit --require ts-node/register test/index.ts"
   },
   "repository": {
@@ -25,14 +26,13 @@
   },
   "homepage": "https://github.com/hyurl/dotry#readme",
   "devDependencies": {
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^12.6.6",
-    "mocha": "^6.1.4",
-    "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.13",
+    "mocha": "^8.0.1",
+    "ts-node": "^8.10.2"
   },
   "dependencies": {
     "check-iterable": "^1.0.2",
-    "tslib": "^1.10.0"
+    "tslib": "^1.13.0"
   }
 }
