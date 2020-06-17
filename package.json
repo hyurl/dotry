@@ -26,9 +26,9 @@
   },
   "homepage": "https://github.com/hyurl/dotry#readme",
   "devDependencies": {
-    "@types/mocha": "^7.0.2",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^14.0.13",
-    "mocha": "^8.0.1",
+    "mocha": "^6.2.3",
     "ts-node": "^8.10.2"
   },
   "dependencies": {
